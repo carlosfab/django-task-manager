@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "django-task-manager"
+version = "0.1.0"
+description = "A beginner-friendly Django task manager application"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{ include = "taskmanager" }]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+django = "^5.2"
+python-decouple = "^3.8"
+python-dotenv = "^1.1.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
