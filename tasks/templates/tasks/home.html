@@ -1,13 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
-</head>
-<body>
-    <h1>Hello World!</h1>
-    <p>{{ welcome_message }}</p>
-    <p>Teste</p>
-</body>
-</html>
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4">{{ title }}</h1>
+        <p class="lead">{{ message }}</p>
+        
+        <div class="card mt-4 mb-4">
+            <div class="card-body">
+                <h5 class="card-title">O que você pode fazer:</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Criar novas tarefas</li>
+                    <li class="list-group-item">Gerenciar prazos e prioridades</li>
+                    <li class="list-group-item">Marcar tarefas como concluídas</li>
+                    <li class="list-group-item">Organizar seu trabalho diário</li>
+                </ul>
+            </div>
+        </div>
+        
+        <a href="{% url 'tasks:task_list' %}" class="btn btn-primary btn-lg">Ver Tarefas</a>
+        <a href="{% url 'tasks:create_task' %}" class="btn btn-success btn-lg">Nova Tarefa</a>
+    </div>
+</div>
+{% endblock %}

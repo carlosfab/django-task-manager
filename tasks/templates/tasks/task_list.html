@@ -1,0 +1,125 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Lista de Tarefas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Lista de Tarefas</h1>
+    <a href="{% url 'tasks:create_task' %}" class="btn btn-success">
+        <i class="bi bi-plus"></i> Nova Tarefa
+    </a>
+</div>
+
+{% if tasks %}
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    Baixa Prioridade
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for task in tasks %}
+                        {% if task.priority == 1 %}
+                            <li class="list-group-item priority-1 {% if task.completed %}task-completed{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
+                                            {{ task.title }}
+                                        </a>
+                                        {% if task.due_date %}
+                                            <small class="text-muted d-block">Vence: {{ task.due_date|date:"d/m/Y" }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'tasks:toggle_complete' task.id %}?next={{ request.path|urlencode }}" class="btn btn-sm 
+                                           {% if task.completed %}btn-secondary{% else %}btn-outline-success{% endif %}">
+                                            {% if task.completed %}✓{% else %}□{% endif %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    Média Prioridade
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for task in tasks %}
+                        {% if task.priority == 2 %}
+                            <li class="list-group-item priority-2 {% if task.completed %}task-completed{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
+                                            {{ task.title }}
+                                        </a>
+                                        {% if task.due_date %}
+                                            <small class="text-muted d-block">Vence: {{ task.due_date|date:"d/m/Y" }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'tasks:toggle_complete' task.id %}?next={{ request.path|urlencode }}" class="btn btn-sm 
+                                           {% if task.completed %}btn-secondary{% else %}btn-outline-warning{% endif %}">
+                                            {% if task.completed %}✓{% else %}□{% endif %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    Alta Prioridade
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for task in tasks %}
+                        {% if task.priority == 3 %}
+                            <li class="list-group-item priority-3 {% if task.completed %}task-completed{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
+                                            {{ task.title }}
+                                        </a>
+                                        {% if task.due_date %}
+                                            <small class="text-muted d-block">Vence: {{ task.due_date|date:"d/m/Y" }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'tasks:toggle_complete' task.id %}?next={{ request.path|urlencode }}" class="btn btn-sm 
+                                           {% if task.completed %}btn-secondary{% else %}btn-outline-danger{% endif %}">
+                                            {% if task.completed %}✓{% else %}□{% endif %}
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        Nenhuma tarefa encontrada. <a href="{% url 'tasks:create_task' %}">Adicione uma nova tarefa</a>.
+    </div>
+{% endif %}
+
+<div class="mt-4">
+    <h5>Legenda:</h5>
+    <ul class="list-inline">
+        <li class="list-inline-item"><span class="badge bg-success">Verde</span> - Baixa Prioridade</li>
+        <li class="list-inline-item"><span class="badge bg-warning text-dark">Amarelo</span> - Média Prioridade</li>
+        <li class="list-inline-item"><span class="badge bg-danger">Vermelho</span> - Alta Prioridade</li>
+    </ul>
+</div>
+{% endblock %}

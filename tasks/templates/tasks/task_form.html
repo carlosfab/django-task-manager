@@ -1,0 +1,70 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h2>{{ title }}</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">Título:</label>
+                        {{ form.title.errors }}
+                        <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" 
+                               class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+                               value="{{ form.title.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Descrição:</label>
+                        {{ form.description.errors }}
+                        <textarea name="{{ form.description.name }}" id="{{ form.description.id_for_label }}" 
+                                  class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                  rows="4">{{ form.description.value|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.due_date.id_for_label }}" class="form-label">Prazo:</label>
+                            {{ form.due_date.errors }}
+                            <input type="datetime-local" name="{{ form.due_date.name }}" id="{{ form.due_date.id_for_label }}" 
+                                   class="form-control {% if form.due_date.errors %}is-invalid{% endif %}"
+                                   value="{{ form.due_date.value|default:'' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.priority.id_for_label }}" class="form-label">Prioridade:</label>
+                            {{ form.priority.errors }}
+                            <select name="{{ form.priority.name }}" id="{{ form.priority.id_for_label }}" 
+                                    class="form-select {% if form.priority.errors %}is-invalid{% endif %}">
+                                {% for value, label in form.fields.priority.choices %}
+                                    <option value="{{ value }}" {% if form.priority.value|stringformat:"i" == value|stringformat:"i" %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="{{ form.completed.name }}" id="{{ form.completed.id_for_label }}" 
+                               class="form-check-input" {% if form.completed.value %}checked{% endif %}>
+                        <label class="form-check-label" for="{{ form.completed.id_for_label }}">Concluída</label>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
