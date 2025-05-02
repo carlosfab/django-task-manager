@@ -1,0 +1,29 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Lista de Tarefas{% endblock %}
+
+{% block content %}
+    <h1>Lista de Tarefas</h1>
+    
+    {% comment %} <a href="{% url 'tasks:create_task' %}">Nova Tarefa</a> {% endcomment %}
+    
+    {% if tasks %}
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <a href="{% url 'tasks:task_detail' task.id %}">
+                        {{ task.title }}
+                    </a>
+                    
+                    {% if task.completed %}
+                        (Concluída)
+                    {% endif %}
+                    
+                    - Prioridade: {{ task.get_priority_display }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Não há tarefas disponíveis.</p>
+    {% endif %}
+{% endblock %}
