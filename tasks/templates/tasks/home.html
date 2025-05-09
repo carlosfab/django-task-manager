@@ -1,25 +1,31 @@
 {% extends 'tasks/base.html' %}
 
 {% block content %}
-<div class="row">
+<div class="row fade-in">
     <div class="col-md-8 mx-auto text-center">
-        <h1 class="display-4">{{ title }}</h1>
+        <h1 class="display-4 my-4">{{ title }}</h1>
         <p class="lead">{{ message }}</p>
         
         <div class="card mt-4 mb-4">
             <div class="card-body">
-                <h5 class="card-title">O que você pode fazer:</h5>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">Criar novas tarefas</li>
-                    <li class="list-group-item">Gerenciar prazos e prioridades</li>
-                    <li class="list-group-item">Marcar tarefas como concluídas</li>
-                    <li class="list-group-item">Organizar seu trabalho diário</li>
+                <h5 class="card-title"><i class="fas fa-list-check me-2"></i>O que você pode fazer:</h5>
+                <ul class="list-group list-group-flush mt-3">
+                    <li class="list-group-item"><i class="fas fa-plus-circle text-success me-2"></i>Criar novas tarefas</li>
+                    <li class="list-group-item"><i class="fas fa-calendar-alt text-primary me-2"></i>Gerenciar prazos e prioridades</li>
+                    <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>Marcar tarefas como concluídas</li>
+                    <li class="list-group-item"><i class="fas fa-tasks text-info me-2"></i>Organizar seu trabalho diário</li>
                 </ul>
             </div>
         </div>
         
-        <a href="{% url 'tasks:task_list' %}" class="btn btn-primary btn-lg">Ver Tarefas</a>
-        <a href="{% url 'tasks:create_task' %}" class="btn btn-success btn-lg">Nova Tarefa</a>
+        <div class="mt-4">
+            <a href="{% url 'tasks:task_list' %}" class="btn btn-primary btn-lg btn-icon">
+                <i class="fas fa-list me-2"></i>Ver Tarefas
+            </a>
+            <a href="{% url 'tasks:create_task' %}" class="btn btn-success btn-lg btn-icon ms-2">
+                <i class="fas fa-plus me-2"></i>Nova Tarefa
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

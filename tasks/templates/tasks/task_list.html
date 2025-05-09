@@ -3,123 +3,136 @@
 {% block title %}Lista de Tarefas{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Lista de Tarefas</h1>
-    <a href="{% url 'tasks:create_task' %}" class="btn btn-success">
-        <i class="bi bi-plus"></i> Nova Tarefa
-    </a>
-</div>
-
-{% if tasks %}
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    Baixa Prioridade
-                </div>
-                <ul class="list-group list-group-flush">
-                    {% for task in tasks %}
-                        {% if task.priority == 1 %}
-                            <li class="list-group-item priority-1 {% if task.completed %}task-completed{% endif %}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
-                                            {{ task.title }}
-                                        </a>
-                                        {% if task.due_date %}
-                                            <small class="text-muted d-block">Vence: {{ task.due_date|date:"d/m/Y" }}</small>
-                                        {% endif %}
-                                    </div>
-                                    <div>
-                                        <a href="{% url 'tasks:toggle_complete' task.id %}?next={{ request.path|urlencode }}" class="btn btn-sm 
-                                           {% if task.completed %}btn-secondary{% else %}btn-outline-success{% endif %}">
-                                            {% if task.completed %}✓{% else %}□{% endif %}
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-        
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    Média Prioridade
-                </div>
-                <ul class="list-group list-group-flush">
-                    {% for task in tasks %}
-                        {% if task.priority == 2 %}
-                            <li class="list-group-item priority-2 {% if task.completed %}task-completed{% endif %}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
-                                            {{ task.title }}
-                                        </a>
-                                        {% if task.due_date %}
-                                            <small class="text-muted d-block">Vence: {{ task.due_date|date:"d/m/Y" }}</small>
-                                        {% endif %}
-                                    </div>
-                                    <div>
-                                        <a href="{% url 'tasks:toggle_complete' task.id %}?next={{ request.path|urlencode }}" class="btn btn-sm 
-                                           {% if task.completed %}btn-secondary{% else %}btn-outline-warning{% endif %}">
-                                            {% if task.completed %}✓{% else %}□{% endif %}
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-        
-        <div class="col-md-4 mb-3">
-            <div class="card">
-                <div class="card-header bg-danger text-white">
-                    Alta Prioridade
-                </div>
-                <ul class="list-group list-group-flush">
-                    {% for task in tasks %}
-                        {% if task.priority == 3 %}
-                            <li class="list-group-item priority-3 {% if task.completed %}task-completed{% endif %}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
-                                            {{ task.title }}
-                                        </a>
-                                        {% if task.due_date %}
-                                            <small class="text-muted d-block">Vence: {{ task.due_date|date:"d/m/Y" }}</small>
-                                        {% endif %}
-                                    </div>
-                                    <div>
-                                        <a href="{% url 'tasks:toggle_complete' task.id %}?next={{ request.path|urlencode }}" class="btn btn-sm 
-                                           {% if task.completed %}btn-secondary{% else %}btn-outline-danger{% endif %}">
-                                            {% if task.completed %}✓{% else %}□{% endif %}
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
+        <h1><i class="fas fa-tasks me-2"></i>Lista de Tarefas</h1>
+        <a href="{% url 'tasks:create_task' %}" class="btn btn-success btn-icon">
+            <i class="fas fa-plus me-2"></i>Nova Tarefa
+        </a>
     </div>
-{% else %}
-    <div class="alert alert-info">
-        Nenhuma tarefa encontrada. <a href="{% url 'tasks:create_task' %}">Adicione uma nova tarefa</a>.
-    </div>
-{% endif %}
-
-<div class="mt-4">
-    <h5>Legenda:</h5>
-    <ul class="list-inline">
-        <li class="list-inline-item"><span class="badge bg-success">Verde</span> - Baixa Prioridade</li>
-        <li class="list-inline-item"><span class="badge bg-warning text-dark">Amarelo</span> - Média Prioridade</li>
-        <li class="list-inline-item"><span class="badge bg-danger">Vermelho</span> - Alta Prioridade</li>
-    </ul>
-</div>
+    
+    {% if tasks %}
+        <div class="row fade-in">
+            <!-- Coluna de tarefas pendentes -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="fas fa-hourglass-half me-2 text-warning"></i>
+                        <span class="fw-bold">Tarefas Pendentes</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for task in tasks %}
+                                {% if not task.completed %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
+                                                    <span class="fs-5">{{ task.title }}</span>
+                                                </a>
+                                                
+                                                {% if task.priority == 3 %}
+                                                    <span class="badge-priority badge-priority-3 ms-2">
+                                                        <i class="fas fa-arrow-up me-1"></i>Alta
+                                                    </span>
+                                                {% elif task.priority == 2 %}
+                                                    <span class="badge-priority badge-priority-2 ms-2">
+                                                        <i class="fas fa-equals me-1"></i>Média
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge-priority badge-priority-1 ms-2">
+                                                        <i class="fas fa-arrow-down me-1"></i>Baixa
+                                                    </span>
+                                                {% endif %}
+                                                
+                                                {% if task.due_date %}
+                                                    <small class="text-muted d-block mt-1">
+                                                        <i class="far fa-calendar-alt me-1"></i>
+                                                        {{ task.due_date|date:"d/m/Y H:i" }}
+                                                    </small>
+                                                {% endif %}
+                                            </div>
+                                            <div class="d-flex">
+                                                <a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver detalhes">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <form method="post" action="{% url 'tasks:toggle_complete' task.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Marcar como concluída">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Coluna de tarefas concluídas -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2 text-success"></i>
+                        <span class="fw-bold">Tarefas Concluídas</span>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for task in tasks %}
+                                {% if task.completed %}
+                                    <li class="list-group-item opacity-75">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-line-through text-muted">
+                                                    <span class="fs-5">{{ task.title }}</span>
+                                                </a>
+                                                
+                                                {% if task.priority == 3 %}
+                                                    <span class="badge-priority badge-priority-3 ms-2 opacity-75">
+                                                        <i class="fas fa-arrow-up me-1"></i>Alta
+                                                    </span>
+                                                {% elif task.priority == 2 %}
+                                                    <span class="badge-priority badge-priority-2 ms-2 opacity-75">
+                                                        <i class="fas fa-equals me-1"></i>Média
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge-priority badge-priority-1 ms-2 opacity-75">
+                                                        <i class="fas fa-arrow-down me-1"></i>Baixa
+                                                    </span>
+                                                {% endif %}
+                                                
+                                                {% if task.due_date %}
+                                                    <small class="text-muted d-block mt-1">
+                                                        <i class="far fa-calendar-alt me-1"></i>
+                                                        {{ task.due_date|date:"d/m/Y H:i" }}
+                                                    </small>
+                                                {% endif %}
+                                            </div>
+                                            <div class="d-flex">
+                                                <a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver detalhes">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <form method="post" action="{% url 'tasks:toggle_complete' task.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Reabrir tarefa">
+                                                        <i class="fas fa-undo"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info fade-in">
+            <i class="fas fa-info-circle me-2"></i>Não há tarefas disponíveis.
+        </div>
+    {% endif %}
 {% endblock %}

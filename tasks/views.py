@@ -1,22 +1,30 @@
+# from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Task
 from .forms import TaskForm
 
+# Create your views here.
 def home(request):
-    title = "Task Manager"
+    title = "Gerenciador de Tarefas"
+    # Option 1: return a simple string
+    # return HttpResponse("Hello, world! This is the home page.")
+
+    # Option 2: return a template
     return render(request, 'tasks/home.html', {
         'title': title,
-        'message': 'Welcome to the Task Manager application!'
+        'message': 'Bem-vindo ao Gerenciador de Tarefas!'
     })
 
 def task_list(request):
-    tasks = Task.objects.all()  # O ordering está definido na classe Meta do modelo
-    return render(request, 'tasks/task_list.html', {'tasks': tasks})
+    tasks = Task.objects.order_by('-priority', 'due_date')
+    context = {'tasks': tasks}
+    return render(request, 'tasks/task_list.html', context)
 
 def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    return render(request, 'tasks/task_detail.html', {'task': task})
+    context = {'task': task}
+    return render(request, 'tasks/task_detail.html', context)
 
 def create_task(request):
     if request.method == 'POST':
@@ -44,7 +52,6 @@ def update_task(request, task_id):
     
     return render(request, 'tasks/task_form.html', {
         'form': form, 
-        'task': task,
         'title': 'Editar Tarefa'
     })
 
@@ -56,12 +63,25 @@ def delete_task(request, task_id):
         messages.success(request, 'Tarefa excluída com sucesso!')
         return redirect('tasks:task_list')
     
-    return render(request, 'tasks/task_confirm_delete.html', {'task': task})
+    return render(request, 'tasks/delete_task.html', {'task': task})
 
 def toggle_complete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    task.completed = not task.completed
-    task.save()
     
-    next_url = request.GET.get('next', 'tasks:task_list')
-    return redirect(next_url)
+    if request.method == 'POST':
+        task.completed = not task.completed
+        task.save()
+        
+        status_message = 'concluída' if task.completed else 'pendente'
+        messages.success(request, f'Tarefa marcada como {status_message}!')
+        
+        # Check where the request came from to redirect back there
+        referer = request.META.get('HTTP_REFERER', '')
+        
+        if 'task_detail' in referer:
+            return redirect('tasks:task_detail', task_id=task.id)
+        else:
+            return redirect('tasks:task_list')
+    
+    # In case someone tries to access this URL directly via GET
+    return redirect('tasks:task_detail', task_id=task.id)

@@ -1,0 +1,38 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Excluir Tarefa{% endblock %}
+
+{% block content %}
+    <div class="mb-4 d-flex justify-content-between align-items-center fade-in">
+        <h1><i class="fas fa-trash-alt me-2 text-danger"></i>Excluir Tarefa</h1>
+        <a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-outline-secondary btn-icon">
+            <i class="fas fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+    
+    <div class="card border-danger fade-in">
+        <div class="card-header bg-danger text-white">
+            <i class="fas fa-exclamation-triangle me-2"></i>Confirmação de Exclusão
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <p class="mb-0">Você tem certeza que deseja excluir a tarefa <strong>"{{ task.title }}"</strong>?</p>
+                <p class="mb-0 mt-2"><small>Esta ação não pode ser desfeita.</small></p>
+            </div>
+            
+            <div class="mt-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex">
+                        <button type="submit" class="btn btn-danger btn-icon">
+                            <i class="fas fa-trash me-2"></i>Sim, Excluir
+                        </button>
+                        <a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-secondary btn-icon ms-2">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

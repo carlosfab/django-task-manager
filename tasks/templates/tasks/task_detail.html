@@ -1,73 +1,93 @@
 {% extends 'tasks/base.html' %}
 
-{% block title %}{{ task.title }}{% endblock %}
+{% block title %}Detalhes da Tarefa{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header priority-{{ task.priority }} {% if task.completed %}bg-secondary{% endif %}">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2>
-                {% if task.completed %}<span class="text-decoration-line-through">{{ task.title }}</span>{% else %}{{ task.title }}{% endif %}
-            </h2>
-            <div>
-                <a href="{% url 'tasks:toggle_complete' task.id %}?next={{ request.path|urlencode }}" class="btn 
-                   {% if task.completed %}btn-secondary{% else %}btn-success{% endif %}">
-                    {% if task.completed %}Marcar como pendente{% else %}Marcar como concluída{% endif %}
-                </a>
+    <div class="mb-4 d-flex justify-content-between align-items-center fade-in">
+        <h1><i class="fas fa-clipboard-list me-2"></i>Detalhes da Tarefa</h1>
+        <a href="{% url 'tasks:task_list' %}" class="btn btn-outline-secondary btn-icon">
+            <i class="fas fa-arrow-left me-2"></i>Voltar
+        </a>
+    </div>
+    
+    <div class="card priority-{{ task.priority }} fade-in">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>{{ task.title }}</h2>
+                {% if task.completed %}
+                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Concluída</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark"><i class="fas fa-hourglass-half me-1"></i>Pendente</span>
+                {% endif %}
             </div>
         </div>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-8">
-                <h5>Descrição:</h5>
-                <p>{{ task.description|linebreaks|default:"Sem descrição." }}</p>
-                
-                <div class="mt-4">
-                    <h5>Detalhes:</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <strong>Prioridade:</strong> 
-                            {% if task.priority == 1 %}
-                                <span class="badge bg-success">Baixa</span>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-3">
+                        <i class="fas fa-align-left text-muted me-2"></i>
+                        <strong>Descrição:</strong> 
+                        <span class="ms-2">{{ task.description|default:"Sem descrição" }}</span>
+                    </p>
+                    
+					<p class="mb-3">
+						<i class="fas fa-calendar-plus text-muted me-2"></i>
+						<strong>Data de Criação:</strong> 
+						<span class="ms-2">{{ task.created_at|date:"d/m/Y" }}</span>
+					</p>
+                </div>
+                <div class="col-md-6">
+                    {% if task.due_date %}
+                        <p class="mb-3">
+                            <i class="fas fa-calendar-alt text-muted me-2"></i>
+                            <strong>Data Limite:</strong> 
+                            <span class="ms-2">{{ task.due_date|date:"d/m/Y" }}</span>
+                        </p>
+                    {% endif %}
+                    
+                    <p class="mb-3">
+                        <i class="fas fa-signal text-muted me-2"></i>
+                        <strong>Prioridade:</strong> 
+                        <span class="ms-2">
+                            {% if task.priority == 3 %}
+                                <span class="badge-priority badge-priority-3">
+                                    <i class="fas fa-arrow-up me-1"></i>Alta
+                                </span>
                             {% elif task.priority == 2 %}
-                                <span class="badge bg-warning text-dark">Média</span>
+                                <span class="badge-priority badge-priority-2">
+                                    <i class="fas fa-equals me-1"></i>Média
+                                </span>
                             {% else %}
-                                <span class="badge bg-danger">Alta</span>
+                                <span class="badge-priority badge-priority-1">
+                                    <i class="fas fa-arrow-down me-1"></i>Baixa
+                                </span>
                             {% endif %}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Status:</strong> 
-                            {% if task.completed %}
-                                <span class="badge bg-secondary">Concluída</span>
-                            {% else %}
-                                <span class="badge bg-primary">Pendente</span>
-                            {% endif %}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Criada em:</strong> {{ task.created_at|date:"d/m/Y H:i" }}
-                        </li>
-                        {% if task.due_date %}
-                        <li class="list-group-item">
-                            <strong>Prazo:</strong> {{ task.due_date|date:"d/m/Y H:i" }}
-                            {% if task.due_date < now and not task.completed %}
-                                <span class="badge bg-danger">Atrasada</span>
-                            {% endif %}
-                        </li>
-                        {% endif %}
-                    </ul>
+                        </span>
+                    </p>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="card-footer d-flex justify-content-between">
-        <div>
-            <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">Voltar</a>
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <a href="{% url 'tasks:update_task' task.id %}" class="btn btn-primary btn-icon">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </a>
+                    <a href="{% url 'tasks:delete_task' task.id %}" class="btn btn-danger btn-icon ms-2">
+                        <i class="fas fa-trash me-2"></i>Excluir
+                    </a>
+                </div>
+                <form method="post" action="{% url 'tasks:toggle_complete' task.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn {% if task.completed %}btn-warning{% else %}btn-success{% endif %} btn-icon">
+                        {% if task.completed %}
+                            <i class="fas fa-undo me-2"></i>Marcar como Pendente
+                        {% else %}
+                            <i class="fas fa-check me-2"></i>Marcar como Concluída
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
         </div>
-        <div>
-            <a href="{% url 'tasks:update_task' task.id %}" class="btn btn-primary">Editar</a>
-            <a href="{% url 'tasks:delete_task' task.id %}" class="btn btn-danger">Excluir</a>
-        </div>
     </div>
-</div>
 {% endblock %}
