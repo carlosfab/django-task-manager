@@ -1,0 +1,37 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Detalhes da Tarefa{% endblock %}
+
+{% block content %}
+    <h1>Detalhes da Tarefa</h1>
+    
+    <div class="card priority-{{ task.priority }}">
+        <div class="card-header">
+            <h2>{{ task.title }}</h2>
+        </div>
+        <div class="card-body">
+            <p><strong>Descrição:</strong> {{ task.description|default:"Sem descrição" }}</p>
+            <p><strong>Data de Criação:</strong> {{ task.created_at|date:"d/m/Y H:i" }}</p>
+            
+            {% if task.due_date %}
+                <p><strong>Data de Vencimento:</strong> {{ task.due_date|date:"d/m/Y H:i" }}</p>
+            {% endif %}
+            
+            <p><strong>Prioridade:</strong> {{ task.get_priority_display }}</p>
+            <p><strong>Status:</strong> {% if task.completed %}Concluída{% else %}Pendente{% endif %}</p>
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'tasks:update_task' task.id %}" class="btn btn-primary">Editar</a>
+            <a href="{% url 'tasks:delete_task' task.id %}" class="btn btn-danger">Excluir</a>
+            
+            <form method="post" action="{% url 'tasks:toggle_complete' task.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">
+                    {% if task.completed %}Marcar como Pendente{% else %}Marcar como Concluída{% endif %}
+                </button>
+            </form>
+            
+            <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </div>
+{% endblock %}

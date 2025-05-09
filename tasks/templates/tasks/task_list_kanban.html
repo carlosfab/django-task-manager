@@ -1,0 +1,83 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Lista de Tarefas{% endblock %}
+
+{% block content %}
+    <h1>Lista de Tarefas</h1>
+    
+    <a href="{% url 'tasks:create_task' %}" class="btn btn-success mb-3">Nova Tarefa</a>
+    
+    {% if tasks %}
+        <div class="row">
+            <!-- Coluna de tarefas pendentes -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Tarefas Pendentes</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for task in tasks %}
+                                {% if not task.completed %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <a href="{% url 'tasks:task_detail' task.id %}">{{ task.title }}</a>
+                                                - 
+                                                {% if task.priority == 3 %}
+                                                    <span class="text-danger">Alta</span>
+                                                {% elif task.priority == 2 %}
+                                                    <span class="text-warning">Média</span>
+                                                {% else %}
+                                                    <span class="text-success">Baixa</span>
+                                                {% endif %}
+                                            </div>
+                                            <form method="post" action="{% url 'tasks:toggle_complete' task.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-success">Concluir</button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Coluna de tarefas concluídas -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Tarefas Concluídas</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for task in tasks %}
+                                {% if task.completed %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <a href="{% url 'tasks:task_detail' task.id %}" style="text-decoration: line-through;">{{ task.title }}</a>
+                                                - 
+                                                {% if task.priority == 3 %}
+                                                    <span class="text-danger">Alta</span>
+                                                {% elif task.priority == 2 %}
+                                                    <span class="text-warning">Média</span>
+                                                {% else %}
+                                                    <span class="text-success">Baixa</span>
+                                                {% endif %}
+                                            </div>
+                                            <form method="post" action="{% url 'tasks:toggle_complete' task.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-warning">Reabrir</button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p>Não há tarefas disponíveis.</p>
+    {% endif %}
+{% endblock %}

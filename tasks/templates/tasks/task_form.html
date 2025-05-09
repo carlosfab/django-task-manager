@@ -1,0 +1,39 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Título</label>
+            {{ form.title }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Descrição</label>
+            {{ form.description }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.due_date.id_for_label }}" class="form-label">Data de Vencimento</label>
+            {{ form.due_date }}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.priority.id_for_label }}" class="form-label">Prioridade</label>
+            {{ form.priority }}
+        </div>
+        
+        <div class="mb-3 form-check">
+            {{ form.completed }}
+            <label class="form-check-label" for="{{ form.completed.id_for_label }}">Concluída</label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}
