@@ -11,4 +11,5 @@ urlpatterns = [
     path('tarefas/<int:task_id>/editar/', views.update_task, name='update_task'),
     path('tarefas/<int:task_id>/excluir/', views.delete_task, name='delete_task'),
     path('tarefas/<int:task_id>/alternar/', views.toggle_complete, name='toggle_complete'),
+    path('tarefas/<int:task_id>/atualizar-bucket/', views.update_task_bucket, name='update_task_bucket'),
 ]
