@@ -1,138 +1,393 @@
-{% extends 'tasks/base.html' %}
+{% extends 'tasks/base.html' %} {% load task_extras %} {% block title %}Lista de
+Tarefas{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 fade-in">
+  <h1><i class="fas fa-tasks me-2"></i>Lista de Tarefas</h1>
+  <a href="{% url 'tasks:create_task' %}" class="btn btn-success btn-icon">
+    <i class="fas fa-plus me-2"></i>Nova Tarefa
+  </a>
+</div>
 
-{% block title %}Lista de Tarefas{% endblock %}
+<!-- Two Column Layout -->
+<div class="row fade-in">
+  <!-- Left Column: Task Buckets -->
+  <div class="col-md-8">
+    <!-- First, show tasks without a bucket -->
+    <div class="bucket-container mb-3" id="bucket-sem-categoria">
+      <div class="bucket-header">
+        <i class="fas fa-folder me-2"></i>Sem Categoria
+      </div>
+      <div
+        class="bucket-tasks"
+        data-bucket="none"
+        ondragover="event.preventDefault(); this.classList.add('dropzone-highlight');"
+        ondragleave="this.classList.remove('dropzone-highlight');"
+        ondrop="handleDrop(event, this)"
+      >
+        {% for task in no_bucket_tasks %}
+        <div
+          class="card task-item mb-2"
+          draggable="true"
+          ondragstart="handleDragStart(event);"
+          ondragend="handleDragEnd(event);"
+          data-task-id="{{ task.id }}"
+        >
+          <div class="card-body py-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <a
+                  href="{% url 'tasks:task_detail' task.id %}"
+                  class="text-decoration-none"
+                >
+                  <span class="fs-5">{{ task.title }}</span>
+                </a>
 
-{% block content %}
-    <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
-        <h1><i class="fas fa-tasks me-2"></i>Lista de Tarefas</h1>
-        <a href="{% url 'tasks:create_task' %}" class="btn btn-success btn-icon">
-            <i class="fas fa-plus me-2"></i>Nova Tarefa
-        </a>
+                {% if task.priority == 3 %}
+                <span class="badge-priority badge-priority-3 ms-2">
+                  <i class="fas fa-arrow-up me-1"></i>Alta
+                </span>
+                {% elif task.priority == 2 %}
+                <span class="badge-priority badge-priority-2 ms-2">
+                  <i class="fas fa-equals me-1"></i>Média
+                </span>
+                {% else %}
+                <span class="badge-priority badge-priority-1 ms-2">
+                  <i class="fas fa-arrow-down me-1"></i>Baixa
+                </span>
+                {% endif %} {% if task.due_date %}
+                <small class="text-muted d-block mt-1">
+                  <i class="far fa-calendar-alt me-1"></i>
+                  {{ task.due_date|date:"d/m/Y H:i" }}
+                </small>
+                {% endif %}
+              </div>
+              <div class="d-flex">
+                <a
+                  href="{% url 'tasks:task_detail' task.id %}"
+                  class="btn btn-sm btn-outline-primary me-1"
+                  title="Ver detalhes"
+                >
+                  <i class="fas fa-eye"></i>
+                </a>
+                <form
+                  method="post"
+                  action="{% url 'tasks:toggle_complete' task.id %}"
+                >
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-outline-success"
+                    title="Marcar como concluída"
+                  >
+                    <i class="fas fa-check"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    
-    {% if tasks %}
-        <div class="row fade-in">
-            <!-- Coluna de tarefas pendentes -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header d-flex align-items-center">
-                        <i class="fas fa-hourglass-half me-2 text-warning"></i>
-                        <span class="fw-bold">Tarefas Pendentes</span>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            {% for task in tasks %}
-                                {% if not task.completed %}
-                                    <li class="list-group-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-none">
-                                                    <span class="fs-5">{{ task.title }}</span>
-                                                </a>
-                                                
-                                                {% if task.priority == 3 %}
-                                                    <span class="badge-priority badge-priority-3 ms-2">
-                                                        <i class="fas fa-arrow-up me-1"></i>Alta
-                                                    </span>
-                                                {% elif task.priority == 2 %}
-                                                    <span class="badge-priority badge-priority-2 ms-2">
-                                                        <i class="fas fa-equals me-1"></i>Média
-                                                    </span>
-                                                {% else %}
-                                                    <span class="badge-priority badge-priority-1 ms-2">
-                                                        <i class="fas fa-arrow-down me-1"></i>Baixa
-                                                    </span>
-                                                {% endif %}
-                                                
-                                                {% if task.due_date %}
-                                                    <small class="text-muted d-block mt-1">
-                                                        <i class="far fa-calendar-alt me-1"></i>
-                                                        {{ task.due_date|date:"d/m/Y H:i" }}
-                                                    </small>
-                                                {% endif %}
-                                            </div>
-                                            <div class="d-flex">
-                                                <a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver detalhes">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <form method="post" action="{% url 'tasks:toggle_complete' task.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Marcar como concluída">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </div>
+
+    <!-- Then, show tasks with buckets -->
+    {% for bucket in buckets %}
+    <div class="bucket-container mb-3" id="bucket-{{ bucket.name|slugify }}">
+      <div class="bucket-header">
+        <i class="fas fa-folder me-2"></i>{{ bucket.name }}
+      </div>
+      <div
+        class="bucket-tasks"
+        data-bucket="{{ bucket.id }}"
+        ondragover="event.preventDefault(); this.classList.add('dropzone-highlight');"
+        ondragleave="this.classList.remove('dropzone-highlight');"
+        ondrop="handleDrop(event, this)"
+      >
+        {% with bucket_tasks|get_item:bucket as tasks %} 
+        {% if tasks %} 
+          {% for task in tasks %}
+          <div
+            class="card task-item mb-2"
+            draggable="true"
+            ondragstart="handleDragStart(event);"
+            ondragend="handleDragEnd(event);"
+            data-task-id="{{ task.id }}"
+          >
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <a
+                    href="{% url 'tasks:task_detail' task.id %}"
+                    class="text-decoration-none"
+                  >
+                    <span class="fs-5">{{ task.title }}</span>
+                  </a>
+
+                  {% if task.priority == 3 %}
+                  <span class="badge-priority badge-priority-3 ms-2">
+                    <i class="fas fa-arrow-up me-1"></i>Alta
+                  </span>
+                  {% elif task.priority == 2 %}
+                  <span class="badge-priority badge-priority-2 ms-2">
+                    <i class="fas fa-equals me-1"></i>Média
+                  </span>
+                  {% else %}
+                  <span class="badge-priority badge-priority-1 ms-2">
+                    <i class="fas fa-arrow-down me-1"></i>Baixa
+                  </span>
+                  {% endif %} 
+                  {% if task.due_date %}
+                  <small class="text-muted d-block mt-1">
+                    <i class="far fa-calendar-alt me-1"></i>
+                    {{ task.due_date|date:"d/m/Y H:i" }}
+                  </small>
+                  {% endif %}
                 </div>
-            </div>
-            
-            <!-- Coluna de tarefas concluídas -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header d-flex align-items-center">
-                        <i class="fas fa-check-circle me-2 text-success"></i>
-                        <span class="fw-bold">Tarefas Concluídas</span>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            {% for task in tasks %}
-                                {% if task.completed %}
-                                    <li class="list-group-item opacity-75">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <a href="{% url 'tasks:task_detail' task.id %}" class="text-decoration-line-through text-muted">
-                                                    <span class="fs-5">{{ task.title }}</span>
-                                                </a>
-                                                
-                                                {% if task.priority == 3 %}
-                                                    <span class="badge-priority badge-priority-3 ms-2 opacity-75">
-                                                        <i class="fas fa-arrow-up me-1"></i>Alta
-                                                    </span>
-                                                {% elif task.priority == 2 %}
-                                                    <span class="badge-priority badge-priority-2 ms-2 opacity-75">
-                                                        <i class="fas fa-equals me-1"></i>Média
-                                                    </span>
-                                                {% else %}
-                                                    <span class="badge-priority badge-priority-1 ms-2 opacity-75">
-                                                        <i class="fas fa-arrow-down me-1"></i>Baixa
-                                                    </span>
-                                                {% endif %}
-                                                
-                                                {% if task.due_date %}
-                                                    <small class="text-muted d-block mt-1">
-                                                        <i class="far fa-calendar-alt me-1"></i>
-                                                        {{ task.due_date|date:"d/m/Y H:i" }}
-                                                    </small>
-                                                {% endif %}
-                                            </div>
-                                            <div class="d-flex">
-                                                <a href="{% url 'tasks:task_detail' task.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver detalhes">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <form method="post" action="{% url 'tasks:toggle_complete' task.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Reabrir tarefa">
-                                                        <i class="fas fa-undo"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </div>
+                <div class="d-flex">
+                  <a
+                    href="{% url 'tasks:task_detail' task.id %}"
+                    class="btn btn-sm btn-outline-primary me-1"
+                    title="Ver detalhes"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <form
+                    method="post"
+                    action="{% url 'tasks:toggle_complete' task.id %}"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="submit"
+                      class="btn btn-sm btn-outline-success"
+                      title="Marcar como concluída"
+                    >
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </form>
                 </div>
+              </div>
             </div>
+          </div>
+          {% endfor %} 
+        {% else %}
+          <div class="text-center text-muted py-3">
+            <em>Nenhuma tarefa nesta categoria</em>
+          </div>
+        {% endif %} 
+        {% endwith %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Right Column: Completed Tasks -->
+  <div class="col-md-4 completed-tasks">
+    <div class="card">
+      <div class="card-header d-flex align-items-center">
+        <i class="fas fa-check-circle me-2 text-success"></i>
+        <span class="fw-bold">Tarefas Concluídas</span>
+      </div>
+      <div class="card-body">
+        <div
+          class="bucket-tasks"
+          data-bucket="completed"
+          ondragover="event.preventDefault(); this.classList.add('dropzone-highlight');"
+          ondragleave="this.classList.remove('dropzone-highlight');"
+          ondrop="handleCompletedDrop(event, this)"
+        >
+          {% for task in completed_tasks %}
+          <div
+            class="card task-item mb-2 opacity-75"
+            draggable="true"
+            ondragstart="handleDragStart(event);"
+            ondragend="handleDragEnd(event);"
+            data-task-id="{{ task.id }}"
+          >
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <a
+                    href="{% url 'tasks:task_detail' task.id %}"
+                    class="text-decoration-line-through text-muted"
+                  >
+                    <span class="fs-5">{{ task.title }}</span>
+                  </a>
+
+                  {% if task.priority == 3 %}
+                  <span class="badge-priority badge-priority-3 ms-2 opacity-75">
+                    <i class="fas fa-arrow-up me-1"></i>Alta
+                  </span>
+                  {% elif task.priority == 2 %}
+                  <span class="badge-priority badge-priority-2 ms-2 opacity-75">
+                    <i class="fas fa-equals me-1"></i>Média
+                  </span>
+                  {% else %}
+                  <span class="badge-priority badge-priority-1 ms-2 opacity-75">
+                    <i class="fas fa-arrow-down me-1"></i>Baixa
+                  </span>
+                  {% endif %} 
+                  {% if task.due_date %}
+                  <small class="text-muted d-block mt-1">
+                    <i class="far fa-calendar-alt me-1"></i>
+                    {{ task.due_date|date:"d/m/Y H:i" }}
+                  </small>
+                  {% endif %} 
+                  {% if task.bucket %}
+                  <small class="badge bg-secondary ms-2"
+                    >{{ task.bucket.name }}</small
+                  >
+                  {% endif %}
+                </div>
+                <div class="d-flex">
+                  <a
+                    href="{% url 'tasks:task_detail' task.id %}"
+                    class="btn btn-sm btn-outline-primary me-1"
+                    title="Ver detalhes"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <form
+                    method="post"
+                    action="{% url 'tasks:toggle_complete' task.id %}"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="submit"
+                      class="btn btn-sm btn-outline-warning"
+                      title="Reabrir tarefa"
+                    >
+                      <i class="fas fa-undo"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
         </div>
-    {% else %}
-        <div class="alert alert-info fade-in">
-            <i class="fas fa-info-circle me-2"></i>Não há tarefas disponíveis.
-        </div>
-    {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Form for CSRF token -->
+<form id="csrf-form" style="display: none">{% csrf_token %}</form>
+
+<script>
+// Drag and drop functionality
+let draggedTaskId = null;
+let draggedFromCompleted = false;
+
+function handleDragStart(event) {
+  draggedTaskId = event.target.getAttribute("data-task-id");
+  // Check if the dragged item is from the completed section
+  draggedFromCompleted = event.target.closest('.completed-tasks') !== null;
+  event.dataTransfer.setData("text/plain", draggedTaskId);
+  event.target.classList.add("dragging");
+}
+
+function handleDragEnd(event) {
+  event.target.classList.remove("dragging");
+}
+
+function handleDrop(event, element) {
+  event.preventDefault();
+  element.classList.remove("dropzone-highlight");
+
+  const taskId = draggedTaskId;
+  const newBucket = element.getAttribute("data-bucket");
+
+  if (taskId && newBucket !== null) {
+    if (draggedFromCompleted) {
+      // If task was dragged from completed section, first toggle its completion status
+      // and then update its bucket
+      toggleTaskComplete(taskId, () => {
+        // After marking as incomplete, update the bucket
+        updateTaskBucket(taskId, newBucket);
+      });
+    } else {
+      // Just update the bucket as before
+      updateTaskBucket(taskId, newBucket);
+    }
+  }
+}
+
+function handleCompletedDrop(event, element) {
+  event.preventDefault();
+  element.classList.remove("dropzone-highlight");
+
+  const taskId = draggedTaskId;
+
+  if (taskId) {
+    // Only mark as completed if it's not already completed
+    if (!draggedFromCompleted) {
+      toggleTaskComplete(taskId);
+    }
+  }
+}
+
+function updateTaskBucket(taskId, bucket) {
+  // Create a form to submit
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "/tarefas/" + taskId + "/atualizar-bucket/";
+
+  // Add CSRF token
+  const csrfToken = document.querySelector(
+    "#csrf-form [name=csrfmiddlewaretoken]"
+  ).value;
+  const csrfInput = document.createElement("input");
+  csrfInput.type = "hidden";
+  csrfInput.name = "csrfmiddlewaretoken";
+  csrfInput.value = csrfToken;
+  form.appendChild(csrfInput);
+
+  // Add bucket value
+  const bucketInput = document.createElement("input");
+  bucketInput.type = "hidden";
+  bucketInput.name = "bucket";
+  bucketInput.value = bucket;
+  form.appendChild(bucketInput);
+
+  // Submit form
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function toggleTaskComplete(taskId, callback) {
+  if (callback) {
+    // If a callback is provided, use AJAX to toggle completion first
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/tarefas/" + taskId + "/alternar/", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.setRequestHeader("X-CSRFToken", document.querySelector(
+      "#csrf-form [name=csrfmiddlewaretoken]"
+    ).value);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        callback();
+      }
+    };
+    xhr.send();
+  } else {
+    // Regular form submission (no callback needed)
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/tarefas/" + taskId + "/alternar/";
+
+    // Add CSRF token
+    const csrfToken = document.querySelector(
+      "#csrf-form [name=csrfmiddlewaretoken]"
+    ).value;
+    const csrfInput = document.createElement("input");
+    csrfInput.type = "hidden";
+    csrfInput.name = "csrfmiddlewaretoken";
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+
+    // Submit form
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+</script>
 {% endblock %}

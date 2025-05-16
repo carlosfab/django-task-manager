@@ -1,7 +1,7 @@
 # from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Task
+from .models import Task, Bucket
 from .forms import TaskForm
 
 # Create your views here.
@@ -17,8 +17,31 @@ def home(request):
     })
 
 def task_list(request):
-    tasks = Task.objects.order_by('-priority', 'due_date')
-    context = {'tasks': tasks}
+    tasks = Task.objects.all().order_by('bucket__order', 'bucket__name', '-priority', 'due_date')
+    buckets = Bucket.objects.all()
+
+    # Create a dictionary of tasks grouped by bucket
+    bucket_tasks = {}
+    no_bucket_tasks = []
+
+    for task in tasks:
+        if not task.completed:
+            if task.bucket:
+                if task.bucket not in bucket_tasks:
+                    bucket_tasks[task.bucket] = []
+                bucket_tasks[task.bucket].append(task)
+            else:
+                no_bucket_tasks.append(task)
+
+    # Get completed tasks separately
+    completed_tasks = Task.objects.filter(completed=True).order_by('-priority', 'due_date')
+
+    context = {
+        'buckets': buckets,
+        'bucket_tasks': bucket_tasks,
+        'no_bucket_tasks': no_bucket_tasks,
+        'completed_tasks': completed_tasks,
+    }
     return render(request, 'tasks/task_list.html', context)
 
 def task_detail(request, task_id):
@@ -35,12 +58,12 @@ def create_task(request):
             return redirect('tasks:task_list')
     else:
         form = TaskForm()
-    
+
     return render(request, 'tasks/task_form.html', {'form': form, 'title': 'Nova Tarefa'})
 
 def update_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    
+
     if request.method == 'POST':
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
@@ -49,39 +72,56 @@ def update_task(request, task_id):
             return redirect('tasks:task_detail', task_id=task.id)
     else:
         form = TaskForm(instance=task)
-    
+
     return render(request, 'tasks/task_form.html', {
-        'form': form, 
+        'form': form,
         'title': 'Editar Tarefa'
     })
 
 def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    
+
     if request.method == 'POST':
         task.delete()
         messages.success(request, 'Tarefa excluída com sucesso!')
         return redirect('tasks:task_list')
-    
+
     return render(request, 'tasks/delete_task.html', {'task': task})
 
 def toggle_complete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    
+
     if request.method == 'POST':
         task.completed = not task.completed
         task.save()
-        
+
         status_message = 'concluída' if task.completed else 'pendente'
         messages.success(request, f'Tarefa marcada como {status_message}!')
-        
+
         # Check where the request came from to redirect back there
         referer = request.META.get('HTTP_REFERER', '')
-        
+
         if 'task_detail' in referer:
             return redirect('tasks:task_detail', task_id=task.id)
         else:
             return redirect('tasks:task_list')
-    
+
     # In case someone tries to access this URL directly via GET
     return redirect('tasks:task_detail', task_id=task.id)
+
+def update_task_bucket(request, task_id):
+    if request.method == 'POST':
+        task = get_object_or_404(Task, pk=task_id)
+        bucket_id = request.POST.get('bucket')
+
+        if bucket_id and bucket_id != 'none':
+            # Assign to a bucket
+            bucket = get_object_or_404(Bucket, pk=bucket_id)
+            task.bucket = bucket
+        else:
+            # Remove from any bucket
+            task.bucket = None
+
+        task.save()
+
+    return redirect('tasks:task_list')
