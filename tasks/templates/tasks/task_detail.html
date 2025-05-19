@@ -24,12 +24,13 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
+
                     <p class="mb-3">
-                        <i class="fas fa-align-left text-muted me-2"></i>
-                        <strong>Descrição:</strong> 
-                        <span class="ms-2">{{ task.description|default:"Sem descrição" }}</span>
+                        <i class="fas fa-folder text-muted me-2"></i>
+                        <strong>Categoria:</strong> 
+                        <span class="ms-2">{{ task.bucket|default:"Sem categoria" }}</span>
                     </p>
-                    
+
 					<p class="mb-3">
 						<i class="fas fa-calendar-plus text-muted me-2"></i>
 						<strong>Data de Criação:</strong> 
@@ -37,6 +38,11 @@
 					</p>
                 </div>
                 <div class="col-md-6">
+                    <p class="mb-3">
+                        <i class="fas fa-align-left text-muted me-2"></i>
+                        <strong>Descrição:</strong> 
+                        <span class="ms-2">{{ task.description|default:"Sem descrição" }}</span>
+                    </p>
                     {% if task.due_date %}
                         <p class="mb-3">
                             <i class="fas fa-calendar-alt text-muted me-2"></i>
@@ -44,7 +50,7 @@
                             <span class="ms-2">{{ task.due_date|date:"d/m/Y" }}</span>
                         </p>
                     {% endif %}
-                    
+
                     <p class="mb-3">
                         <i class="fas fa-signal text-muted me-2"></i>
                         <strong>Prioridade:</strong> 

@@ -33,6 +33,28 @@
                                value="{{ form.title.value|default:'' }}" required>
                     </div>
                 </div>
+
+                <!-- Campo de categoria -->
+                <div class="mb-3">
+                    <label for="{{ form.bucket_choice.id_for_label }}" class="form-label">
+                        <i class="fas fa-folder me-2 text-muted"></i>Categoria
+                    </label>
+                    <div class="input-group">
+                        {{ form.bucket_choice.errors }}
+                        {{ form.bucket_choice }}
+                    </div>
+                </div>
+
+                <!-- Campo para nova categoria (inicialmente oculto) -->
+                <div class="mb-3" id="new-bucket-container" style="display: none;">
+                    <label for="{{ form.new_bucket.id_for_label }}" class="form-label">
+                        <i class="fas fa-folder-plus me-2 text-muted"></i>Nova Categoria
+                    </label>
+                    <div class="input-group">
+                        {{ form.new_bucket.errors }}
+                        {{ form.new_bucket }}
+                    </div>
+                </div>
                 
                 <div class="mb-3">
                     <label for="{{ form.description.id_for_label }}" class="form-label">
@@ -96,4 +118,27 @@
             </form>
         </div>
     </div>
+
+    <!-- Script para mostrar/ocultar o campo de nova categoria -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bucketChoiceSelect = document.getElementById('{{ form.bucket_choice.id_for_label }}');
+            const newBucketContainer = document.getElementById('new-bucket-container');
+            
+            // Função para verificar se deve mostrar o campo de nova categoria
+            function toggleNewBucketField() {
+                if (bucketChoiceSelect.value === 'new') {
+                    newBucketContainer.style.display = 'block';
+                } else {
+                    newBucketContainer.style.display = 'none';
+                }
+            }
+            
+            // Verificar no carregamento inicial
+            toggleNewBucketField();
+            
+            // Adicionar listener para quando o valor mudar
+            bucketChoiceSelect.addEventListener('change', toggleNewBucketField);
+        });
+    </script>
 {% endblock %}

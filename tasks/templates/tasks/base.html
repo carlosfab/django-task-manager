@@ -1,212 +1,269 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Gerenciador de Tarefas{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
     <style>
-        :root {
-            --priority-low: #4caf50;
-            --priority-medium: #ff9800;
-            --priority-high: #f44336;
-            --bg-light: #f8f9fa;
-            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      :root {
+        --priority-low: #4caf50;
+        --priority-medium: #ff9800;
+        --priority-high: #f44336;
+        --bg-light: #f8f9fa;
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Configuração para o footer fixo na parte inferior */
+      html {
+        height: 100%;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* vh = viewport height */
+        background-color: #f0f2f5;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .content-wrapper {
+        flex: 1 0 auto; /* Isso faz o conteúdo expandir e ocupar todo espaço disponível */
+      }
+
+      footer {
+        flex-shrink: 0; /* Impede que o footer encolha */
+        margin-top: auto; /* Empurra o footer para baixo */
+      }
+
+      .card {
+        border-radius: 10px;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease;
+        margin-bottom: 20px;
+        border: none;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+      }
+
+      .task-completed {
+        text-decoration: line-through;
+        opacity: 0.7;
+      }
+
+      .priority-1 {
+        border-left: 5px solid var(--priority-low);
+      }
+      .priority-2 {
+        border-left: 5px solid var(--priority-medium);
+      }
+      .priority-3 {
+        border-left: 5px solid var(--priority-high);
+      }
+
+      .btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: all 0.3s;
+      }
+
+      .btn-icon {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .btn-icon i {
+        margin-right: 8px;
+      }
+
+      .navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .list-group-item {
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+      }
+
+      .card-header {
+        border-top-left-radius: 10px !important;
+        border-top-right-radius: 10px !important;
+        background-color: white;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+      }
+
+      .card-footer {
+        border-bottom-left-radius: 10px !important;
+        border-bottom-right-radius: 10px !important;
+        background-color: white;
+      }
+
+      .badge-priority {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
+      }
+
+      .badge-priority-1 {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: var(--priority-low);
+      }
+
+      .badge-priority-2 {
+        background-color: rgba(255, 152, 0, 0.2);
+        color: var(--priority-medium);
+      }
+
+      .badge-priority-3 {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: var(--priority-high);
+      }
+
+      .nav-item {
+        margin-right: 5px;
+      }
+
+      .nav-link {
+        border-radius: 5px;
+        padding: 8px 15px !important;
+      }
+
+      .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      /* Animações sutis */
+      .fade-in {
+        animation: fadeIn 0.5s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
         }
-        
-        /* Configuração para o footer fixo na parte inferior */
-        html {
-            height: 100%;
+        to {
+          opacity: 1;
         }
-        
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;  /* vh = viewport height */
-            background-color: #f0f2f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .content-wrapper {
-            flex: 1 0 auto;  /* Isso faz o conteúdo expandir e ocupar todo espaço disponível */
-        }
-        
-        footer {
-            flex-shrink: 0;  /* Impede que o footer encolha */
-            margin-top: auto;  /* Empurra o footer para baixo */
-        }
-        
-        .card {
-            border-radius: 10px;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.3s ease;
-            margin-bottom: 20px;
-            border: none;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .task-completed {
-            text-decoration: line-through;
-            opacity: 0.7;
-        }
-        
-        .priority-1 { border-left: 5px solid var(--priority-low); }
-        .priority-2 { border-left: 5px solid var(--priority-medium); }
-        .priority-3 { border-left: 5px solid var(--priority-high); }
-        
-        .btn {
-            border-radius: 8px;
-            padding: 8px 16px;
-            transition: all 0.3s;
-        }
-        
-        .btn-icon {
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .btn-icon i {
-            margin-right: 8px;
-        }
-        
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .list-group-item {
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border: 1px solid rgba(0,0,0,0.125);
-        }
-        
-        .card-header {
-            border-top-left-radius: 10px !important;
-            border-top-right-radius: 10px !important;
-            background-color: white;
-            border-bottom: 1px solid rgba(0,0,0,0.125);
-        }
-        
-        .card-footer {
-            border-bottom-left-radius: 10px !important;
-            border-bottom-right-radius: 10px !important;
-            background-color: white;
-        }
-        
-        .badge-priority {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
-        
-        .badge-priority-1 {
-            background-color: rgba(76, 175, 80, 0.2);
-            color: var(--priority-low);
-        }
-        
-        .badge-priority-2 {
-            background-color: rgba(255, 152, 0, 0.2);
-            color: var(--priority-medium);
-        }
-        
-        .badge-priority-3 {
-            background-color: rgba(244, 67, 54, 0.2);
-            color: var(--priority-high);
-        }
-        
-        .nav-item {
-            margin-right: 5px;
-        }
-        
-        .nav-link {
-            border-radius: 5px;
-            padding: 8px 15px !important;
-        }
-        
-        .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
-        }
-        
-        /* Animações sutis */
-        .fade-in {
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+      }
+      .bucket-container {
+        margin-bottom: 20px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+      }
+      .bucket-header {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-bottom: 1px solid #e9ecef;
+        font-weight: bold;
+        border-radius: 6px 6px 0 0;
+      }
+      .bucket-tasks {
+        min-height: 50px;
+        padding: 10px;
+      }
+      .task-item {
+        cursor: grab;
+        margin-bottom: 8px;
+      }
+      .task-item:active {
+        cursor: grabbing;
+      }
+      .dropzone-highlight {
+        background-color: rgba(0, 123, 255, 0.1);
+      }
+      .dragging {
+        opacity: 0.5;
+      }
+      .completed-tasks {
+        margin-top: 30px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{% url 'tasks:home' %}">
-                <i class="fas fa-check-square me-2"></i>
-                <span class="fw-bold">Gerenciador de Tarefas</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks:home' %}">
-                            <i class="fas fa-home me-1"></i> Início
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks:task_list' %}">
-                            <i class="fas fa-tasks me-1"></i> Tarefas
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tasks:create_task' %}">
-                            <i class="fas fa-plus-circle me-1"></i> Nova Tarefa
-                        </a>
-                    </li>
-                </ul>
-            </div>
+      <div class="container">
+        <a
+          class="navbar-brand d-flex align-items-center"
+          href="{% url 'tasks:home' %}"
+        >
+          <i class="fas fa-check-square me-2"></i>
+          <span class="fw-bold">Gerenciador de Tarefas</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'tasks:home' %}">
+                <i class="fas fa-home me-1"></i> Início
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'tasks:task_list' %}">
+                <i class="fas fa-tasks me-1"></i> Tarefas
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'tasks:create_task' %}">
+                <i class="fas fa-plus-circle me-1"></i> Nova Tarefa
+              </a>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
 
     <div class="content-wrapper">
-        <div class="container mt-4">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                        {% if message.tags == 'success' %}
-                            <i class="fas fa-check-circle me-2"></i>
-                        {% elif message.tags == 'warning' %}
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                        {% elif message.tags == 'danger' %}
-                            <i class="fas fa-times-circle me-2"></i>
-                        {% else %}
-                            <i class="fas fa-info-circle me-2"></i>
-                        {% endif %}
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            {% block content %}{% endblock %}
+      <div class="container mt-4">
+        {% if messages %} {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+          {% if message.tags == 'success' %}
+          <i class="fas fa-check-circle me-2"></i>
+          {% elif message.tags == 'warning' %}
+          <i class="fas fa-exclamation-circle me-2"></i>
+          {% elif message.tags == 'danger' %}
+          <i class="fas fa-times-circle me-2"></i>
+          {% else %}
+          <i class="fas fa-info-circle me-2"></i>
+          {% endif %} {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Fechar"
+          ></button>
         </div>
+        {% endfor %} {% endif %} {% block content %}{% endblock %}
+      </div>
     </div>
 
     <footer class="bg-dark text-white py-4">
-        <div class="container text-center">
-            <p class="mb-0">
-                <i class="fas fa-code me-2"></i>Gerenciador de Tarefas Django - Exemplo de Aplicação
-            </p>
-            <small class="text-muted">Desenvolvido para o curso de Django</small>
-        </div>
+      <div class="container text-center">
+        <p class="mb-0">
+          <i class="fas fa-code me-2"></i>Gerenciador de Tarefas Django -
+          Exemplo de Aplicação
+        </p>
+        <small class="text-white">Desenvolvido para o curso de Django</small>
+      </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>
